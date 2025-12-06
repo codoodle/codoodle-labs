@@ -1,0 +1,20 @@
+# Build output
+.next/
+dist/
+out/
+coverage/
+
+# Dependencies
+node_modules/
+
+# Log files
+*.log
+
+# Lock files
+pnpm-lock.yaml
+
+# Type declaration files
+*.d.ts
+
+# Static assets
+public/

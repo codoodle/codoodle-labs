@@ -1,0 +1,24 @@
+{
+  "name": "@codoodle-labs/vue",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "packageManager": "pnpm@10.24.0",
+  "dependencies": {
+    "lodash": "catalog:",
+    "tailwindcss": "catalog:",
+    "vue": "^3.5.24",
+    "vue-router": "^4.6.3"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.2",
+    "@vue/tsconfig": "^0.8.1",
+    "unplugin-vue-router": "^0.19.0",
+    "vue-tsc": "^3.1.6"
+  }
+}

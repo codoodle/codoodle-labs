@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/favicon.ico" />
+    <title>vanilla</title>
+  </head>
+  <body>
+    <div>
+      <div class="min-h-dvh grid grid-cols-1 grid-rows-[auto_1fr]">
+        <div
+          class="bg-background border-b border-separator row-[1/2] sticky top-0 z-20"
+        >
+          <div
+            class="mx-auto max-lg:max-w-2xl max-lg:border-x max-sm:border-x-0 border-separator"
+          >
+            <div class="p-3 flex items-center gap-4">
+              <div>
+                <a to="/" aria-label="홈으로 이동">
+                  <img
+                    alt="Logo"
+                    aria-hidden="true"
+                    width="24"
+                    height="24"
+                    class="dark:invert"
+                    src="/images/codoodle.png"
+                  />
+                  <span class="sr-only">Codoodle</span>
+                </a>
+              </div>
+              <nav class="ml-auto flex items-center gap-4 text-sm"></nav>
+            </div>
+          </div>
+        </div>
+        <div
+          class="self-stretch grid justify-center grid-cols-1 grid-rows-1 lg:grid-cols-[2.5rem_minmax(0,var(--breakpoint-xl))_2.5rem] row-[2/3]"
+        >
+          <div
+            class="row-[1/2] lg:col-[2/3] border-x max-sm:border-x-0 border-separator"
+          >
+            <div class="mx-auto max-lg:max-w-2xl p-8">
+              <div>
+                <h1>@codoodle</h1>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
