@@ -6,6 +6,18 @@ settings:
 
 catalogs:
   default:
+    '@fortawesome/fontawesome-svg-core':
+      specifier: 7.1.0
+      version: 7.1.0
+    '@fortawesome/free-brands-svg-icons':
+      specifier: 7.1.0
+      version: 7.1.0
+    '@fortawesome/free-regular-svg-icons':
+      specifier: 7.1.0
+      version: 7.1.0
+    '@fortawesome/free-solid-svg-icons':
+      specifier: 7.1.0
+      version: 7.1.0
     lodash:
       specifier: 4.17.21
       version: 4.17.21
@@ -80,6 +92,21 @@ importers:
 
   packages/react:
     dependencies:
+      '@fortawesome/fontawesome-svg-core':
+        specifier: 'catalog:'
+        version: 7.1.0
+      '@fortawesome/free-brands-svg-icons':
+        specifier: 'catalog:'
+        version: 7.1.0
+      '@fortawesome/free-regular-svg-icons':
+        specifier: 'catalog:'
+        version: 7.1.0
+      '@fortawesome/free-solid-svg-icons':
+        specifier: 'catalog:'
+        version: 7.1.0
+      '@tanstack/react-router':
+        specifier: ^1.139.14
+        version: 1.139.14(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       lodash:
         specifier: 'catalog:'
         version: 4.17.21
@@ -93,9 +120,6 @@ importers:
         specifier: 'catalog:'
         version: 4.1.17
     devDependencies:
-      '@tanstack/react-router':
-        specifier: ^1.139.14
-        version: 1.139.14(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       '@tanstack/react-router-devtools':
         specifier: ^1.139.15
         version: 1.139.15(@tanstack/react-router@1.139.14(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@tanstack/router-core@1.139.14)(csstype@3.2.3)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(solid-js@1.9.10)
@@ -114,6 +138,18 @@ importers:
 
   packages/vanilla:
     dependencies:
+      '@fortawesome/fontawesome-svg-core':
+        specifier: 'catalog:'
+        version: 7.1.0
+      '@fortawesome/free-brands-svg-icons':
+        specifier: 'catalog:'
+        version: 7.1.0
+      '@fortawesome/free-regular-svg-icons':
+        specifier: 'catalog:'
+        version: 7.1.0
+      '@fortawesome/free-solid-svg-icons':
+        specifier: 'catalog:'
+        version: 7.1.0
       lodash:
         specifier: 'catalog:'
         version: 4.17.21
@@ -123,12 +159,27 @@ importers:
 
   packages/vue:
     dependencies:
+      '@fortawesome/fontawesome-svg-core':
+        specifier: 'catalog:'
+        version: 7.1.0
+      '@fortawesome/free-brands-svg-icons':
+        specifier: 'catalog:'
+        version: 7.1.0
+      '@fortawesome/free-regular-svg-icons':
+        specifier: 'catalog:'
+        version: 7.1.0
+      '@fortawesome/free-solid-svg-icons':
+        specifier: 'catalog:'
+        version: 7.1.0
       lodash:
         specifier: 'catalog:'
         version: 4.17.21
       tailwindcss:
         specifier: 'catalog:'
         version: 4.1.17
+      unplugin-vue-router:
+        specifier: ^0.19.0
+        version: 0.19.0(@vue/compiler-sfc@3.5.25)(typescript@5.9.3)(vue-router@4.6.3(vue@3.5.25(typescript@5.9.3)))(vue@3.5.25(typescript@5.9.3))
       vue:
         specifier: ^3.5.24
         version: 3.5.25(typescript@5.9.3)
@@ -142,9 +193,6 @@ importers:
       '@vue/tsconfig':
         specifier: ^0.8.1
         version: 0.8.1(typescript@5.9.3)(vue@3.5.25(typescript@5.9.3))
-      unplugin-vue-router:
-        specifier: ^0.19.0
-        version: 0.19.0(@vue/compiler-sfc@3.5.25)(typescript@5.9.3)(vue-router@4.6.3(vue@3.5.25(typescript@5.9.3)))(vue@3.5.25(typescript@5.9.3))
       vue-tsc:
         specifier: ^3.1.6
         version: 3.1.6(typescript@5.9.3)
@@ -494,6 +542,26 @@ packages:
   '@eslint/plugin-kit@0.4.1':
     resolution: {integrity: sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@fortawesome/fontawesome-common-types@7.1.0':
+    resolution: {integrity: sha512-l/BQM7fYntsCI//du+6sEnHOP6a74UixFyOYUyz2DLMXKx+6DEhfR3F2NYGE45XH1JJuIamacb4IZs9S0ZOWLA==}
+    engines: {node: '>=6'}
+
+  '@fortawesome/fontawesome-svg-core@7.1.0':
+    resolution: {integrity: sha512-fNxRUk1KhjSbnbuBxlWSnBLKLBNun52ZBTcs22H/xEEzM6Ap81ZFTQ4bZBxVQGQgVY0xugKGoRcCbaKjLQ3XZA==}
+    engines: {node: '>=6'}
+
+  '@fortawesome/free-brands-svg-icons@7.1.0':
+    resolution: {integrity: sha512-9byUd9bgNfthsZAjBl6GxOu1VPHgBuRUP9juI7ZoM98h8xNPTCTagfwUFyYscdZq4Hr7gD1azMfM9s5tIWKZZA==}
+    engines: {node: '>=6'}
+
+  '@fortawesome/free-regular-svg-icons@7.1.0':
+    resolution: {integrity: sha512-0e2fdEyB4AR+e6kU4yxwA/MonnYcw/CsMEP9lH82ORFi9svA6/RhDyhxIv5mlJaldmaHLLYVTb+3iEr+PDSZuQ==}
+    engines: {node: '>=6'}
+
+  '@fortawesome/free-solid-svg-icons@7.1.0':
+    resolution: {integrity: sha512-Udu3K7SzAo9N013qt7qmm22/wo2hADdheXtBfxFTecp+ogsc0caQNRKEb7pkvvagUGOpG9wJC1ViH6WXs8oXIA==}
+    engines: {node: '>=6'}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -1169,8 +1237,8 @@ packages:
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
 
-  baseline-browser-mapping@2.9.3:
-    resolution: {integrity: sha512-8QdH6czo+G7uBsNo0GiUfouPN1lRzKdJTGnKXwe12gkFbnnOUaUKGN55dMkfy+mnxmvjwl9zcI4VncczcVXDhA==}
+  baseline-browser-mapping@2.9.4:
+    resolution: {integrity: sha512-ZCQ9GEWl73BVm8bu5Fts8nt7MHdbt5vY9bP6WGnUh+r3l8M7CgfyTlwsgCbMC66BNxPr6Xoce3j66Ms5YUQTNA==}
     hasBin: true
 
   binary-extensions@2.3.0:
@@ -2906,6 +2974,24 @@ snapshots:
       '@eslint/core': 0.17.0
       levn: 0.4.1
 
+  '@fortawesome/fontawesome-common-types@7.1.0': {}
+
+  '@fortawesome/fontawesome-svg-core@7.1.0':
+    dependencies:
+      '@fortawesome/fontawesome-common-types': 7.1.0
+
+  '@fortawesome/free-brands-svg-icons@7.1.0':
+    dependencies:
+      '@fortawesome/fontawesome-common-types': 7.1.0
+
+  '@fortawesome/free-regular-svg-icons@7.1.0':
+    dependencies:
+      '@fortawesome/fontawesome-common-types': 7.1.0
+
+  '@fortawesome/free-solid-svg-icons@7.1.0':
+    dependencies:
+      '@fortawesome/fontawesome-common-types': 7.1.0
+
   '@humanfs/core@0.19.1': {}
 
   '@humanfs/node@0.16.7':
@@ -3614,7 +3700,7 @@ snapshots:
 
   balanced-match@1.0.2: {}
 
-  baseline-browser-mapping@2.9.3: {}
+  baseline-browser-mapping@2.9.4: {}
 
   binary-extensions@2.3.0: {}
 
@@ -3635,7 +3721,7 @@ snapshots:
 
   browserslist@4.28.1:
     dependencies:
-      baseline-browser-mapping: 2.9.3
+      baseline-browser-mapping: 2.9.4
       caniuse-lite: 1.0.30001759
       electron-to-chromium: 1.5.266
       node-releases: 2.0.27

@@ -10,6 +10,10 @@
   },
   "packageManager": "pnpm@10.24.0",
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "catalog:",
+    "@fortawesome/free-brands-svg-icons": "catalog:",
+    "@fortawesome/free-regular-svg-icons": "catalog:",
+    "@fortawesome/free-solid-svg-icons": "catalog:",
     "lodash": "catalog:",
     "tailwindcss": "catalog:"
   }

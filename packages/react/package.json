@@ -10,13 +10,17 @@
   },
   "packageManager": "pnpm@10.24.0",
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "catalog:",
+    "@fortawesome/free-brands-svg-icons": "catalog:",
+    "@fortawesome/free-regular-svg-icons": "catalog:",
+    "@fortawesome/free-solid-svg-icons": "catalog:",
+    "@tanstack/react-router": "^1.139.14",
     "lodash": "catalog:",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "tailwindcss": "catalog:"
   },
   "devDependencies": {
-    "@tanstack/react-router": "^1.139.14",
     "@tanstack/react-router-devtools": "^1.139.15",
     "@tanstack/router-plugin": "^1.139.14",
     "@types/react": "^19.2.5",
