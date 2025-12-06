@@ -1,5 +1,7 @@
 import "./main.css";
 
+import { dom, library } from "@fortawesome/fontawesome-svg-core";
+import { faReact } from "@fortawesome/free-brands-svg-icons";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
@@ -21,3 +23,6 @@ if (!rootElement.innerHTML) {
     </StrictMode>,
   );
 }
+
+dom.watch();
+library.add(faReact);

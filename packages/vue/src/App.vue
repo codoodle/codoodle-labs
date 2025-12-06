@@ -20,7 +20,10 @@
               <span class="sr-only">Codoodle</span>
             </RouterLink>
           </div>
-          <nav class="ml-auto flex items-center gap-4 text-sm" />
+          <div class="ml-auto flex items-center gap-4">
+            <nav class="flex items-center gap-4 text-sm" />
+            <i class="fa-brands fa-vuejs"></i>
+          </div>
         </div>
       </div>
     </div>

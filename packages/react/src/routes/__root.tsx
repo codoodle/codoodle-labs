@@ -20,7 +20,10 @@ const RootLayout = () => (
                 <span className="sr-only">Codoodle</span>
               </Link>
             </div>
-            <nav className="ml-auto flex items-center gap-4 text-sm"></nav>
+            <div className="ml-auto flex items-center gap-4">
+              <nav className="flex items-center gap-4 text-sm"></nav>
+              <i className="fa-brands fa-react"></i>
+            </div>
           </div>
         </div>
       </div>
