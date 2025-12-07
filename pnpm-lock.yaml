@@ -150,6 +150,9 @@ importers:
       '@fortawesome/free-solid-svg-icons':
         specifier: 'catalog:'
         version: 7.1.0
+      '@vue/reactivity':
+        specifier: ^3.5.25
+        version: 3.5.25
       lodash:
         specifier: 'catalog:'
         version: 4.17.21

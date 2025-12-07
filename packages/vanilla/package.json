@@ -14,6 +14,7 @@
     "@fortawesome/free-brands-svg-icons": "catalog:",
     "@fortawesome/free-regular-svg-icons": "catalog:",
     "@fortawesome/free-solid-svg-icons": "catalog:",
+    "@vue/reactivity": "^3.5.25",
     "lodash": "catalog:",
     "tailwindcss": "catalog:"
   }
