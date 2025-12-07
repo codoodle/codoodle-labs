@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import Playground from "../components/Playground";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -6,8 +7,6 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <div>
-      <h1>@codoodle</h1>
-    </div>
+    <Playground title="@codoodle" description="Welcome to Codoodle Labs!" />
   );
 }

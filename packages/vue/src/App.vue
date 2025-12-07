@@ -22,7 +22,7 @@
           </div>
           <div class="ml-auto flex items-center gap-4">
             <nav class="flex items-center gap-4 text-sm" />
-            <i class="fa-brands fa-vuejs"></i>
+            <i class="fa-brands fa-vuejs text-muted-foreground/50"></i>
           </div>
         </div>
       </div>
@@ -30,10 +30,10 @@
     <div
       class="self-stretch grid justify-center grid-cols-1 grid-rows-1 lg:grid-cols-[2.5rem_minmax(0,var(--breakpoint-xl))_2.5rem] row-[2/3]"
     >
-      <div
-        class="row-[1/2] lg:col-[2/3] border-x max-sm:border-x-0 border-separator"
-      >
-        <div class="mx-auto max-lg:max-w-2xl">
+      <div class="row-[1/2] lg:col-[2/3]">
+        <div
+          class="h-full mx-auto max-lg:max-w-2xl border-x max-sm:border-x-0 border-separator"
+        >
           <RouterView />
         </div>
       </div>

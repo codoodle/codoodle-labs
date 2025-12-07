@@ -6,6 +6,38 @@
   }
 }
 
+@layer components {
+  .codoodle-button {
+    @apply inline-flex items-center gap-2 rounded-md border border-border bg-background px-4 h-9 text-sm font-semibold text-foreground shadow-sm transition hover:-translate-y-px hover:border-border/60 hover:shadow disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .codoodle-button-primary {
+    @apply inline-flex items-center gap-2 rounded-md border border-primary bg-primary px-4 h-9 text-sm font-semibold text-primary-foreground shadow-sm transition hover:-translate-y-px hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .codoodle-input {
+    @apply h-9;
+  }
+  .codoodle-textarea {
+    @apply py-3;
+  }
+  .codoodle-input,
+  .codoodle-textarea {
+    @apply w-full rounded-md border border-input bg-background px-4 text-sm shadow-inner outline-none ring-offset-background focus:border-primary focus:ring-2 focus:ring-primary/40;
+  }
+  .codoodle-input-group {
+    @apply inline-flex items-center gap-2 rounded-md border border-border bg-background px-3 h-9 text-sm shadow-sm;
+
+    > .codoodle-input {
+      @apply px-3 h-6 rounded-sm border-border/60;
+    }
+  }
+  .codoodle-card {
+    @apply rounded-sm border border-border/70 bg-card shadow-sm;
+  }
+  .codoodle-card-secondary {
+    @apply rounded-sm border border-border/60 bg-secondary/20 p-5 shadow-sm
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
