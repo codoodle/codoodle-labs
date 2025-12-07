@@ -1,7 +1,13 @@
-import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
+import {
+  createRootRoute,
+  Link,
+  Outlet,
+  useMatchRoute,
+} from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 const RootLayout = () => {
+  const matchRoute = useMatchRoute();
   return (
     <>
       <div className="min-h-dvh grid grid-cols-1 grid-rows-[auto_1fr]">
@@ -22,7 +28,19 @@ const RootLayout = () => {
                 </Link>
               </div>
               <div className="ml-auto flex items-center gap-4">
-                <nav className="flex items-center gap-4 text-sm"></nav>
+                <nav className="flex items-center gap-4 text-sm">
+                  <Link
+                    to="/auto-save"
+                    className="data-active:text-primary data-active:font-semibold"
+                    {...(matchRoute({ to: "/auto-save" })
+                      ? {
+                          ["data-active"]: "true",
+                        }
+                      : {})}
+                  >
+                    자동 저장
+                  </Link>
+                </nav>
                 <i className="fa-brands fa-react text-muted-foreground/50"></i>
               </div>
             </div>

@@ -21,7 +21,13 @@
             </RouterLink>
           </div>
           <div class="ml-auto flex items-center gap-4">
-            <nav class="flex items-center gap-4 text-sm" />
+            <nav class="flex items-center gap-4 text-sm">
+              <RouterLink
+                to="/auto-save"
+                active-class="text-primary font-semibold"
+                >자동 저장</RouterLink
+              >
+            </nav>
             <i class="fa-brands fa-vuejs text-muted-foreground/50"></i>
           </div>
         </div>
