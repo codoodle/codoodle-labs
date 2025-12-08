@@ -99,6 +99,28 @@ export default defineConfig([
     },
   },
 
+  // Legacy grid: allow legacy patterns without touching source
+  {
+    name: "legacy-grid",
+    files: ["packages/legacy-grid/**/*.{ts,js}"],
+    languageOptions: {
+      parser: eslintTsParser,
+      parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+        project: ["packages/legacy-grid/tsconfig.app.json"],
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unsafe-declaration-merging": "off",
+      "@typescript-eslint/no-unsafe-function-type": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "prefer-const": "off",
+    },
+  },
+
   // Prettier recommended
   eslintPrettierConfig,
 

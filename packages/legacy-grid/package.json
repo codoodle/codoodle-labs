@@ -1,0 +1,16 @@
+{
+  "name": "@codoodle-labs/legacy-grid",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest"
+  },
+  "packageManager": "pnpm@10.24.0",
+  "devDependencies": {
+    "sass": "^1.94.2"
+  }
+}

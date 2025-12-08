@@ -1,0 +1,173 @@
+$colors-gridBorder: rgb(161, 159, 157);
+$colors-gridBorderIn: #c8c6c4;
+$colors-gridBorderFocus: #0078d4;
+$colors-gridBackground: #ffffff;
+$colors-gridBackgroundHead: #faf9f8;
+$colors-gridBackgroundSelected: #eeffe4;
+$colors-gridText: #323130;
+$colors-gridTextHead: #323130;
+$colors-gridTextSelected: #323130;
+
+.zsControl {
+  .zsFocusTrappable {
+    .zsFocusTrappableTrap {
+      background-color: inherit;
+    }
+  }
+}
+
+.zsGrid {
+  background-color: $colors-gridBackground;
+  border: 1px solid $colors-gridBorder;
+  color: $colors-gridText;
+  overflow: hidden;
+  position: relative;
+  user-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+
+  div {
+    box-sizing: border-box;
+  }
+
+  &.zsGridScrollableHorizontal {
+    .zsGridCellLastColumn {
+      border-right: none;
+    }
+    .zsGridCornerNw {
+      border-left: 1px solid $colors-gridBorderIn;
+    }
+  }
+
+  &.zsGridScrollableVertical {
+    .zsGridCellLastRow {
+      border-bottom: none;
+    }
+    .zsGridCornerSe {
+      border-top: 1px solid $colors-gridBorderIn;
+    }
+  }
+
+  .zsGridWrapper {
+    height: 100%;
+    position: relative;
+    width: 100%;
+  }
+
+  .zsGridCorner {
+    background-color: $colors-gridBackgroundHead;
+    position: absolute;
+  }
+
+  .zsGridCornerNe {
+    border-bottom: 1px solid $colors-gridBorderIn;
+    border-right: 1px solid $colors-gridBorderIn;
+    left: 0;
+    top: 0;
+  }
+
+  .zsGridCornerNw {
+    border-bottom: 1px solid $colors-gridBorderIn;
+    right: 0;
+    top: 0;
+  }
+
+  .zsGridCornerSe {
+    left: 0;
+    bottom: 0;
+    border-right: 1px solid $colors-gridBorderIn;
+  }
+
+  .zsGridHead {
+    color: $colors-gridTextHead;
+    position: absolute;
+
+    &.zsGridRowsHeader {
+      top: 0;
+      .zsGridCellLastColumn {
+        border-right: 1px solid $colors-gridBorderIn;
+      }
+    }
+
+    &.zsGridColumnsHeader {
+      left: 0;
+      .zsGridCellLastRow {
+        border-bottom: 1px solid $colors-gridBorderIn;
+      }
+    }
+
+    .zsGridCell {
+      background-color: $colors-gridBackgroundHead;
+      border-color: $colors-gridBorderIn;
+      font-weight: bold;
+      text-align: center;
+    }
+  }
+
+  .zsGridBody {
+    position: absolute;
+
+    .zsGridScroll {
+      left: 0;
+      overflow: auto;
+      position: absolute;
+      top: 0;
+
+      .zsGridScrollIn {
+        background-color: inherit;
+      }
+    }
+  }
+
+  .zsGridIn {
+    left: 0;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    &.zsGridFrozenHorizontal .zsGridCellLastRow {
+      border-bottom: 1px solid $colors-gridBorderIn;
+    }
+    &.zsGridFrozenVertical .zsGridCellLastColumn {
+      border-right: 1px solid $colors-gridBorderIn;
+    }
+  }
+
+  .zsGridInWrapper {
+    position: absolute;
+  }
+
+  .zsGridCell {
+    background-color: $colors-gridBackground;
+    border-right: 1px solid $colors-gridBorderIn;
+    border-bottom: 1px solid $colors-gridBorderIn;
+    overflow: hidden;
+    outline: transparent;
+    position: absolute;
+    text-overflow: ellipsis;
+
+    &.zsFocus,
+    &:focus,
+    &:focus-within {
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border: 1px solid $colors-gridBorderFocus;
+        outline: none;
+        z-index: 1;
+      }
+    }
+
+    &.zsSelected {
+      background-color: $colors-gridBackgroundSelected;
+      color: $colors-gridTextSelected;
+    }
+
+    .zsGridCellContent {
+      height: 100%;
+      padding: 0 5px;
+      position: absolute;
+      width: 100%;
+    }
+  }
+}
