@@ -27,7 +27,7 @@ export default defineConfig([
   // Shared package configuration
   {
     name: "shared",
-    files: ["packages/**/*.{js,ts,tsx,vue}"],
+    files: ["apps/**/*.{js,ts,tsx,vue}", "packages/**/*.{js,ts,tsx,vue}"],
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -45,7 +45,7 @@ export default defineConfig([
     settings: {
       "import/resolver": {
         typescript: {
-          project: "packages/*/tsconfig.app.json",
+          project: ["apps/*/tsconfig.app.json", "packages/*/tsconfig.app.json"],
         },
         node: true,
       },
@@ -55,7 +55,7 @@ export default defineConfig([
   // React recommended
   {
     name: "react",
-    files: ["packages/react/**/*.{ts,tsx}"],
+    files: ["apps/react/**/*.{ts,tsx}"],
     extends: [
       eslintReact.configs.flat.recommended,
       eslintReact.configs.flat["jsx-runtime"],
@@ -67,7 +67,7 @@ export default defineConfig([
         ecmaVersion: "latest",
         sourceType: "module",
         ecmaFeatures: { jsx: true },
-        project: ["packages/react/tsconfig.app.json"],
+        project: ["apps/react/tsconfig.app.json"],
       },
     },
     settings: {
@@ -78,7 +78,7 @@ export default defineConfig([
   // Vue recommended
   {
     name: "vue",
-    files: ["packages/vue/**/*.{js,ts,vue}"],
+    files: ["apps/vue/**/*.{js,ts,vue}"],
     extends: [eslintVue.configs["flat/recommended"]],
     languageOptions: {
       parser: eslintVueParser,
@@ -93,7 +93,7 @@ export default defineConfig([
   // Vue pages exceptions
   {
     name: "vue-pages",
-    files: ["packages/vue/src/pages/**/*.vue"],
+    files: ["apps/vue/src/pages/**/*.vue"],
     rules: {
       "vue/multi-word-component-names": "off",
     },

@@ -1,8 +1,8 @@
 {
   "files": [],
   "references": [
-    { "path": "packages/react" },
-    { "path": "packages/vue" },
-    { "path": "packages/vanilla" }
+    { "path": "apps/react" },
+    { "path": "apps/vue" },
+    { "path": "apps/vanilla" }
   ]
 }
