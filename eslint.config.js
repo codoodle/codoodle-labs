@@ -52,6 +52,19 @@ export default defineConfig([
     },
   },
 
+  // Test files: loosen explicit any for pragmatic mocks
+  {
+    name: "tests",
+    files: [
+      "**/*.spec.{js,ts,tsx}",
+      "**/*.test.{js,ts,tsx}",
+      "**/__tests__/**/*.{js,ts,tsx}",
+    ],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
+
   // React recommended
   {
     name: "react",
