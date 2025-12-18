@@ -156,5 +156,6 @@ export default defineConfig([
     "pnpm-lock.yaml",
     "package-lock.json",
     "yarn.lock",
+    "packages/legacy-grid/audit.js",
   ]),
 ]);
