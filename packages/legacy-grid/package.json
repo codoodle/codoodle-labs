@@ -9,6 +9,11 @@
     "preview": "vite preview",
     "test": "vitest"
   },
+  "author": {
+    "name": "Yeongseok Yoon",
+    "url": "https://codoodle.github.io"
+  },
+  "license": "MIT",
   "packageManager": "pnpm@10.24.0",
   "devDependencies": {
     "sass": "^1.94.2"

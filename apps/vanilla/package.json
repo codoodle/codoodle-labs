@@ -8,6 +8,11 @@
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
+  "author": {
+    "name": "Yeongseok Yoon",
+    "url": "https://codoodle.github.io"
+  },
+  "license": "MIT",
   "packageManager": "pnpm@10.24.0",
   "dependencies": {
     "@codoodle/grid": "workspace:*",
