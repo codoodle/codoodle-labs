@@ -10,6 +10,7 @@
   },
   "packageManager": "pnpm@10.24.0",
   "dependencies": {
+    "@codoodle/grid": "workspace:*",
     "@fortawesome/fontawesome-svg-core": "catalog:",
     "@fortawesome/free-brands-svg-icons": "catalog:",
     "@fortawesome/free-regular-svg-icons": "catalog:",

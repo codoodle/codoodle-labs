@@ -150,6 +150,9 @@ importers:
 
   apps/vanilla:
     dependencies:
+      '@codoodle/grid':
+        specifier: workspace:*
+        version: link:../../packages/grid
       '@fortawesome/fontawesome-svg-core':
         specifier: 'catalog:'
         version: 7.1.0
