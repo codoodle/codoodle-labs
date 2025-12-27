@@ -1,0 +1,23 @@
+{
+  "name": "@codoodle/grid",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./dist/index.css": "./dist/index.css"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "packageManager": "pnpm@10.24.0",
+  "devDependencies": {
+    "resize-observer-polyfill": "^1.5.1"
+  }
+}
