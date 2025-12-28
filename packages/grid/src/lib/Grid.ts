@@ -1771,6 +1771,37 @@ export class Grid extends Container {
     this._mouseStartIsExtended =
       this._selectionMode === GridSelectionMode.Extended &&
       ((PlatformInfo.isMac && e.metaKey) || (!PlatformInfo.isMac && e.ctrlKey));
+
+    {
+      this._inBFF?.clearReservedFocus();
+      this._inBNF?.clearReservedFocus();
+      this._inBFN?.clearReservedFocus();
+      this._inBNN?.clearReservedFocus();
+
+      if (this._mouseStartIsRowsHeader || this._mouseStartIsColumnsHeader) {
+        let { rowBegin: rowIndex, columnBegin: columnIndex } =
+          this._mouseStartTarget.getIndex({ x, y }, true);
+
+        if (this._mouseStartIsRowsHeader) {
+          columnIndex = 0;
+        } else {
+          rowIndex = 0;
+        }
+        const targetPart = this.getPart(rowIndex, columnIndex);
+        if (this._inBFF === targetPart) {
+          this._inBFF.reserveFocus(rowIndex, columnIndex);
+        }
+        if (this._inBNF === targetPart) {
+          this._inBNF.reserveFocus(rowIndex, columnIndex);
+        }
+        if (this._inBFN === targetPart) {
+          this._inBFN.reserveFocus(rowIndex, columnIndex);
+        }
+        if (this._inBNN === targetPart) {
+          this._inBNN.reserveFocus(rowIndex, columnIndex);
+        }
+      }
+    }
     if (
       !(
         !this._mouseStartIsExtended &&
@@ -2038,6 +2069,10 @@ export class Grid extends Container {
    * 마우스 업 이벤트를 처리합니다.
    */
   protected onMouseUp(): void {
+    this._inBFF?.applyReservedFocus();
+    this._inBNF?.applyReservedFocus();
+    this._inBFN?.applyReservedFocus();
+    this._inBNN?.applyReservedFocus();
     this._mouseStart = undefined;
     this._mouseMoveTick = false;
     this._elementWrapper.addEventListener("wheel", this._wheelListener, false);

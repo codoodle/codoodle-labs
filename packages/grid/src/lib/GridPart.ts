@@ -45,6 +45,7 @@ export class GridPart extends Container {
   protected _cellsIndex: GridBounds;
   protected _selectedRanges: GridBounds[] = [];
   protected _cellFactory: GridCellFactory;
+  protected _reservedFocus: CellKey | undefined;
 
   /**
    * 파트의 유형을 가져옵니다.
@@ -338,15 +339,58 @@ export class GridPart extends Container {
   }
 
   /**
-   * 지정한 행과 열의 인덱스에 표시되는 셀로 포커스를 이동합니다.
+   * 포커스할 셀을 예약합니다. 예약된 셀은 disposeCell에서 제거되지 않습니다.
    * @param rowIndex 행 인덱스입니다.
    * @param columnIndex 열 인덱스입니다.
    */
-  focus(rowIndex: number, columnIndex: number): void {
-    this.scrollInto(rowIndex, columnIndex);
-    const cell = this._cells.get(cellKey(rowIndex, columnIndex));
+  reserveFocus(rowIndex: number, columnIndex: number): void {
+    this._reservedFocus = cellKey(rowIndex, columnIndex);
+  }
+
+  /**
+   * 예약된 포커스를 취소합니다.
+   */
+  clearReservedFocus(): void {
+    this._reservedFocus = undefined;
+  }
+
+  /**
+   * 예약된 셀로 포커스를 이동하고 예약을 클리어합니다.
+   */
+  applyReservedFocus(): void {
+    if (this._reservedFocus) {
+      const cell = this._cells.get(this._reservedFocus);
+      this._reservedFocus = undefined;
+      if (cell && cell.element !== document.activeElement) {
+        cell.element.focus({
+          preventScroll: true,
+        });
+      }
+    } else {
+      this._reservedFocus = undefined;
+    }
+  }
+
+  /**
+   * 지정한 행과 열의 인덱스에 표시되는 셀로 포커스를 이동합니다.
+   * @param rowIndex 행 인덱스입니다.
+   * @param columnIndex 열 인덱스입니다.
+   * @param shouldScroll 셀이 화면에 보이도록 스크롤할지 여부입니다. 기본값은 true입니다.
+   */
+  focus(rowIndex: number, columnIndex: number, shouldScroll = true): void {
+    let cell = this._cells.get(cellKey(rowIndex, columnIndex));
+    if (cell && cell.element === document.activeElement) {
+      return;
+    }
+
+    if (shouldScroll) {
+      this.scrollInto(rowIndex, columnIndex);
+    }
+    cell = this._cells.get(cellKey(rowIndex, columnIndex));
     if (cell && cell.element !== document.activeElement) {
-      cell.element.focus();
+      cell.element.focus({
+        preventScroll: true,
+      });
     }
   }
 
@@ -550,6 +594,7 @@ export class GridPart extends Container {
    * @param merges 병합할 셀에 대한 정보입니다.
    */
   merge(merges: GridMerge[]): void {
+    this.clearReservedFocus();
     this._cells.forEach((cell) => this.disposeCell(cell));
     this._cells.clear();
     this._cellsIndex = {
@@ -636,8 +681,9 @@ export class GridPart extends Container {
   /**
    * 지정한 위치에 표시된 행과 열의 인덱스를 가져옵니다.
    * @param location 인덱스를 확인할 위치입니다.
+   * @param raw true인 경우 병합 셀 처리를 건너뛰고 순수한 셀 인덱스를 반환합니다. 기본값은 false입니다.
    */
-  getIndex(location: Point): GridBounds {
+  getIndex(location: Point, raw = false): GridBounds {
     const boundsWrapper = this._elementWrapper.getBoundingClientRect();
     const left =
       location.x -
@@ -650,6 +696,10 @@ export class GridPart extends Container {
       this._rows[this._cellsIndex.rowBegin].top -
       this._location.y;
     const index = this.getIndexBounds({ left, top, width: 0, height: 0 });
+    if (raw) {
+      return index;
+    }
+
     const cell = this._cells.get(cellKey(index.rowBegin, index.columnBegin));
     if (cell && cell.isMerged) {
       return {
@@ -987,11 +1037,15 @@ export class GridPart extends Container {
    */
   protected disposeCell(cell: GridCell, reusable = false): boolean {
     if (reusable) {
-      // 포커스가 유지되어야 하는 셀은 재사용/제거 대상에서 제외합니다.
       if (cell.element === document.activeElement) {
         return false;
       }
-      // 병합된 셀은 구조적으로 재사용이 불가능하므로 즉시 폐기합니다.
+      if (
+        this._reservedFocus &&
+        cell === this._cells.get(this._reservedFocus)
+      ) {
+        return false;
+      }
       if (cell.isMerged) {
         cell.element.remove();
         cell.dispose();
