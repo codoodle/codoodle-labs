@@ -1709,10 +1709,57 @@ export class Grid extends Container {
    * @param e
    */
   protected onMouseDown(e: MouseEvent): void {
+    const { clientX: x, clientY: y } = e;
+    {
+      this._inBFF?.clearReservedFocus();
+      this._inBNF?.clearReservedFocus();
+      this._inBFN?.clearReservedFocus();
+      this._inBNN?.clearReservedFocus();
+
+      this._mouseStartIsRowsHeader = false;
+      this._mouseStartIsColumnsHeader = false;
+      if (this._inHCF?.element === e.currentTarget) {
+        this._mouseStartTarget = this._inHCF;
+        this._mouseStartIsColumnsHeader = true;
+      } else if (this._inHCN?.element === e.currentTarget) {
+        this._mouseStartTarget = this._inHCN;
+        this._mouseStartIsColumnsHeader = true;
+      } else if (this._inHRF?.element === e.currentTarget) {
+        this._mouseStartTarget = this._inHRF;
+        this._mouseStartIsRowsHeader = true;
+      } else if (this._inHRN?.element === e.currentTarget) {
+        this._mouseStartTarget = this._inHRN;
+        this._mouseStartIsRowsHeader = true;
+      }
+
+      if (this._mouseStartIsRowsHeader || this._mouseStartIsColumnsHeader) {
+        let { rowBegin: rowIndex, columnBegin: columnIndex } =
+          this._mouseStartTarget.getIndex({ x, y }, true);
+
+        if (this._mouseStartIsRowsHeader) {
+          columnIndex = 0;
+        } else {
+          rowIndex = 0;
+        }
+        const targetPart = this.getPart(rowIndex, columnIndex);
+        if (this._inBFF === targetPart) {
+          this._inBFF.reserveFocus(rowIndex, columnIndex);
+        }
+        if (this._inBNF === targetPart) {
+          this._inBNF.reserveFocus(rowIndex, columnIndex);
+        }
+        if (this._inBFN === targetPart) {
+          this._inBFN.reserveFocus(rowIndex, columnIndex);
+        }
+        if (this._inBNN === targetPart) {
+          this._inBNN.reserveFocus(rowIndex, columnIndex);
+        }
+      }
+    }
+
     if (e.button !== 0 || this._selectionMode === GridSelectionMode.None) {
       return;
     }
-    const { clientX: x, clientY: y } = e;
     this._mouseStart = { x, y };
     this._mouseMove = { x, y };
     this._mouseStartIsRowsHeader = false;
@@ -1772,36 +1819,6 @@ export class Grid extends Container {
       this._selectionMode === GridSelectionMode.Extended &&
       ((PlatformInfo.isMac && e.metaKey) || (!PlatformInfo.isMac && e.ctrlKey));
 
-    {
-      this._inBFF?.clearReservedFocus();
-      this._inBNF?.clearReservedFocus();
-      this._inBFN?.clearReservedFocus();
-      this._inBNN?.clearReservedFocus();
-
-      if (this._mouseStartIsRowsHeader || this._mouseStartIsColumnsHeader) {
-        let { rowBegin: rowIndex, columnBegin: columnIndex } =
-          this._mouseStartTarget.getIndex({ x, y }, true);
-
-        if (this._mouseStartIsRowsHeader) {
-          columnIndex = 0;
-        } else {
-          rowIndex = 0;
-        }
-        const targetPart = this.getPart(rowIndex, columnIndex);
-        if (this._inBFF === targetPart) {
-          this._inBFF.reserveFocus(rowIndex, columnIndex);
-        }
-        if (this._inBNF === targetPart) {
-          this._inBNF.reserveFocus(rowIndex, columnIndex);
-        }
-        if (this._inBFN === targetPart) {
-          this._inBFN.reserveFocus(rowIndex, columnIndex);
-        }
-        if (this._inBNN === targetPart) {
-          this._inBNN.reserveFocus(rowIndex, columnIndex);
-        }
-      }
-    }
     if (
       !(
         !this._mouseStartIsExtended &&
@@ -2069,6 +2086,7 @@ export class Grid extends Container {
    * 마우스 업 이벤트를 처리합니다.
    */
   protected onMouseUp(): void {
+    // TODO: 이것 때문에 선택한 셀 영역 계산이 틀어지는 문제 수정 필요
     this._inBFF?.applyReservedFocus();
     this._inBNF?.applyReservedFocus();
     this._inBFN?.applyReservedFocus();

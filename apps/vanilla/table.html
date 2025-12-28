@@ -34,12 +34,12 @@
                   <a href="/auto-save.html">자동 저장</a>
                 </nav>
                 <nav class="flex items-center gap-4 text-sm">
-                  <a href="/grid.html" class="text-primary font-semibold">
-                    그리드
-                  </a>
+                  <a href="/grid.html">그리드</a>
                 </nav>
                 <nav class="flex items-center gap-4 text-sm">
-                  <a href="/table.html">테이블</a>
+                  <a href="/table.html" class="text-primary font-semibold">
+                    테이블
+                  </a>
                 </nav>
                 <i class="fa-solid fa-ice-cream text-muted-foreground/50"></i>
               </div>
@@ -62,17 +62,15 @@
                       <p
                         class="text-xs/6 uppercase tracking-[0.2em] text-muted-foreground"
                       >
-                        Grid (1000000x1000000)
+                        Table Example
                       </p>
-                      <h1 class="font-semibold leading-tight">
-                        그리드 데모
-                      </h1>
+                      <h1 class="font-semibold leading-tight">테이블 데모</h1>
                     </div>
                   </div>
                 </header>
                 <main class="mx-auto max-w-5xl px-4 py-4 sm:px-6 sm:py-6">
                   <div class="flex flex-col gap-6">
-                    <div id="grid-root" class="text-xs h-192"></div>
+                    <div id="table-root" class="text-xs h-192"></div>
                   </div>
                 </main>
               </div>
@@ -81,6 +79,6 @@
         </div>
       </div>
     </div>
-    <script type="module" src="/src/grid.ts"></script>
+    <script type="module" src="/src/table.ts"></script>
   </body>
 </html>

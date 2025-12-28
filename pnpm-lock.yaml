@@ -153,6 +153,9 @@ importers:
       '@codoodle/grid':
         specifier: workspace:*
         version: link:../../packages/grid
+      '@codoodle/table':
+        specifier: workspace:*
+        version: link:../../packages/table
       '@fortawesome/fontawesome-svg-core':
         specifier: 'catalog:'
         version: 7.1.0
