@@ -1,4 +1,23 @@
-import ResizeObserver from "resize-observer-polyfill";
 import { vi } from "vitest";
 
-vi.stubGlobal("ResizeObserver", ResizeObserver);
+class ResizeObserverMock {
+  constructor(private cb: ResizeObserverCallback) {}
+  observe(target: Element) {
+    this.cb(
+      [
+        {
+          target,
+          contentRect: {
+            width: target.clientWidth,
+            height: target.clientHeight,
+          },
+        } as ResizeObserverEntry,
+      ],
+      this,
+    );
+  }
+  unobserve() {}
+  disconnect() {}
+}
+
+vi.stubGlobal("ResizeObserver", ResizeObserverMock);
