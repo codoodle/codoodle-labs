@@ -1,0 +1,27 @@
+{
+  "name": "@codoodle/table",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "author": {
+    "name": "Yeongseok Yoon",
+    "url": "https://codoodle.github.io"
+  },
+  "license": "MIT",
+  "packageManager": "pnpm@10.24.0",
+  "dependencies": {
+    "@codoodle/grid": "workspace:*"
+  }
+}
