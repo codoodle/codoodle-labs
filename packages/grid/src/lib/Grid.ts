@@ -467,6 +467,21 @@ export class Grid extends Container {
       this._elementScroll.addEventListener("scroll", this._scrollListener, {
         passive: true,
       });
+      this._elementNE.addEventListener(
+        "mousedown",
+        this._mouseDownListener,
+        false,
+      );
+      this._elementNW.addEventListener(
+        "mousedown",
+        this._mouseDownListener,
+        false,
+      );
+      this._elementSE.addEventListener(
+        "mousedown",
+        this._mouseDownListener,
+        false,
+      );
       {
         this._elementHC.appendChild(this._inHCN.element);
         this._elementHR.appendChild(this._inHRN.element);
@@ -629,6 +644,21 @@ export class Grid extends Container {
         false,
       );
       this._elementScroll.removeChild(this._elementScrollIn);
+      this._elementNE.removeEventListener(
+        "mousedown",
+        this._mouseDownListener,
+        false,
+      );
+      this._elementNW.removeEventListener(
+        "mousedown",
+        this._mouseDownListener,
+        false,
+      );
+      this._elementSE.removeEventListener(
+        "mousedown",
+        this._mouseDownListener,
+        false,
+      );
       {
         this._elementHC.removeChild(this._inHCN.element);
         this._elementHR.removeChild(this._inHRN.element);
@@ -1050,9 +1080,9 @@ export class Grid extends Container {
         this._elementScroll.scrollTop = inPart.scroll.y / this._scrollZoom.y;
       }
     }
-    this._selectIndex = bounds;
-    this._selectIndexPrevious = { ...this._selectIndex };
-    this._selectIndexBegin = { ...this._selectIndex };
+    // this._selectIndex = bounds;
+    // this._selectIndexPrevious = { ...this._selectIndex };
+    // this._selectIndexBegin = { ...this._selectIndex };
   }
 
   /**
@@ -1709,82 +1739,81 @@ export class Grid extends Container {
    * @param e
    */
   protected onMouseDown(e: MouseEvent): void {
-    if (e.button !== 0 || this._selectionMode === GridSelectionMode.None) {
-      return;
-    }
     const { clientX: x, clientY: y } = e;
-    this._mouseStart = { x, y };
-    this._mouseMove = { x, y };
-    this._mouseStartIsRowsHeader = false;
-    this._mouseStartIsColumnsHeader = false;
-    if (this._inHCF?.element === e.currentTarget) {
-      if (this._selectionUnit === GridSelectionUnit.Column) {
-        return;
-      }
-      this._mouseStartTarget = this._inHCF;
-      this._mouseMoveScrollToZero.horizontal = true;
-      this._mouseMoveScrollToZero.vertical = false;
-      this._mouseStartIsColumnsHeader = true;
-    } else if (this._inHCN?.element === e.currentTarget) {
-      if (this._selectionUnit === GridSelectionUnit.Column) {
-        return;
-      }
-      this._mouseStartTarget = this._inHCN;
-      this._mouseMoveScrollToZero.horizontal = false;
-      this._mouseMoveScrollToZero.vertical = false;
-      this._mouseStartIsColumnsHeader = true;
-    } else if (this._inHRF?.element === e.currentTarget) {
-      if (this._selectionUnit === GridSelectionUnit.Row) {
-        return;
-      }
-      this._mouseStartTarget = this._inHRF;
-      this._mouseMoveScrollToZero.horizontal = false;
-      this._mouseMoveScrollToZero.vertical = true;
-      this._mouseStartIsRowsHeader = true;
-    } else if (this._inHRN?.element === e.currentTarget) {
-      if (this._selectionUnit === GridSelectionUnit.Row) {
-        return;
-      }
-      this._mouseStartTarget = this._inHRN;
-      this._mouseMoveScrollToZero.horizontal = false;
-      this._mouseMoveScrollToZero.vertical = false;
-      this._mouseStartIsRowsHeader = true;
-    } else if (this._inBFF?.element === e.currentTarget) {
-      this._mouseStartTarget = this._inBFF;
-      this._mouseMoveScrollToZero.horizontal = true;
-      this._mouseMoveScrollToZero.vertical = true;
-    } else if (this._inBNF?.element === e.currentTarget) {
-      this._mouseStartTarget = this._inBNF;
-      this._mouseMoveScrollToZero.horizontal = false;
-      this._mouseMoveScrollToZero.vertical = true;
-    } else if (this._inBFN?.element === e.currentTarget) {
-      this._mouseStartTarget = this._inBFN;
-      this._mouseMoveScrollToZero.horizontal = true;
-      this._mouseMoveScrollToZero.vertical = false;
-    } else if (this._inBNN?.element === e.currentTarget) {
-      this._mouseStartTarget = this._inBNN;
-      this._mouseMoveScrollToZero.horizontal = false;
-      this._mouseMoveScrollToZero.vertical = false;
-    }
-
-    this._mouseStartIsSelected = this._inBNN.isSelected({ x, y });
-    this._mouseStartIsExtended =
-      this._selectionMode === GridSelectionMode.Extended &&
-      ((PlatformInfo.isMac && e.metaKey) || (!PlatformInfo.isMac && e.ctrlKey));
-
     {
       this._inBFF?.clearReservedFocus();
       this._inBNF?.clearReservedFocus();
       this._inBFN?.clearReservedFocus();
       this._inBNN?.clearReservedFocus();
 
-      if (this._mouseStartIsRowsHeader || this._mouseStartIsColumnsHeader) {
+      let isElementNE = false;
+      let isElementNW = false;
+      let isElementSE = false;
+      this._mouseStartIsRowsHeader = false;
+      this._mouseStartIsColumnsHeader = false;
+      if (this._inHCF?.element === e.currentTarget) {
+        this._mouseStartTarget = this._inHCF;
+        this._mouseMoveScrollToZero.horizontal = true;
+        this._mouseMoveScrollToZero.vertical = false;
+        this._mouseStartIsColumnsHeader = true;
+      } else if (this._inHCN?.element === e.currentTarget) {
+        this._mouseStartTarget = this._inHCN;
+        this._mouseMoveScrollToZero.horizontal = false;
+        this._mouseMoveScrollToZero.vertical = false;
+        this._mouseStartIsColumnsHeader = true;
+      } else if (this._inHRF?.element === e.currentTarget) {
+        this._mouseStartTarget = this._inHRF;
+        this._mouseMoveScrollToZero.horizontal = false;
+        this._mouseMoveScrollToZero.vertical = true;
+        this._mouseStartIsRowsHeader = true;
+      } else if (this._inHRN?.element === e.currentTarget) {
+        this._mouseStartTarget = this._inHRN;
+        this._mouseMoveScrollToZero.horizontal = false;
+        this._mouseMoveScrollToZero.vertical = false;
+        this._mouseStartIsRowsHeader = true;
+      } else if (this._inBFF?.element === e.currentTarget) {
+        this._mouseStartTarget = this._inBFF;
+        this._mouseMoveScrollToZero.horizontal = true;
+        this._mouseMoveScrollToZero.vertical = true;
+      } else if (this._inBNF?.element === e.currentTarget) {
+        this._mouseStartTarget = this._inBNF;
+        this._mouseMoveScrollToZero.horizontal = false;
+        this._mouseMoveScrollToZero.vertical = true;
+      } else if (this._inBFN?.element === e.currentTarget) {
+        this._mouseStartTarget = this._inBFN;
+        this._mouseMoveScrollToZero.horizontal = true;
+        this._mouseMoveScrollToZero.vertical = false;
+      } else if (this._inBNN?.element === e.currentTarget) {
+        this._mouseStartTarget = this._inBNN;
+        this._mouseMoveScrollToZero.horizontal = false;
+        this._mouseMoveScrollToZero.vertical = false;
+      } else if (this._elementNE === e.currentTarget) {
+        isElementNE = true;
+      } else if (this._elementNW === e.currentTarget) {
+        isElementNW = true;
+      } else if (this._elementSE === e.currentTarget) {
+        isElementSE = true;
+      }
+      if (
+        e.target === this._mouseStartTarget.element ||
+        this._mouseStartIsRowsHeader ||
+        this._mouseStartIsColumnsHeader ||
+        isElementNE ||
+        isElementNW ||
+        isElementSE
+      ) {
         let { rowBegin: rowIndex, columnBegin: columnIndex } =
-          this._mouseStartTarget.getIndex({ x, y }, true);
+          e.target === this._mouseStartTarget.element
+            ? this._mouseStartTarget.getIndex({ x, y }, true)
+            : this._mouseStartIsRowsHeader || this._mouseStartIsColumnsHeader
+              ? this._mouseStartTarget.getIndex({ x, y }, true)
+              : this._focusIndex
+                ? this._focusIndex
+                : { rowBegin: 0, columnBegin: 0 };
 
         if (this._mouseStartIsRowsHeader) {
           columnIndex = 0;
-        } else {
+        } else if (this._mouseStartIsColumnsHeader) {
           rowIndex = 0;
         }
         const targetPart = this.getPart(rowIndex, columnIndex);
@@ -1801,7 +1830,41 @@ export class Grid extends Container {
           this._inBNN.reserveFocus(rowIndex, columnIndex);
         }
       }
+      if (
+        this._selectionMode === GridSelectionMode.None ||
+        (this._mouseStartIsColumnsHeader &&
+          this._selectionUnit === GridSelectionUnit.Column) ||
+        (this._mouseStartIsRowsHeader &&
+          this._selectionUnit === GridSelectionUnit.Row) ||
+        isElementNE ||
+        isElementNW ||
+        isElementSE
+      ) {
+        this._elementWrapper.removeEventListener(
+          "wheel",
+          this._wheelListener,
+          false,
+        );
+        this._elementScroll.removeEventListener(
+          "scroll",
+          this._scrollListener,
+          false,
+        );
+        window.addEventListener("mouseup", this._mouseUpListener, false);
+        return;
+      }
     }
+
+    if (e.button !== 0) {
+      return;
+    }
+    this._mouseStart = { x, y };
+    this._mouseMove = { x, y };
+    this._mouseStartIsSelected = this._inBNN.isSelected({ x, y });
+    this._mouseStartIsExtended =
+      this._selectionMode === GridSelectionMode.Extended &&
+      ((PlatformInfo.isMac && e.metaKey) || (!PlatformInfo.isMac && e.ctrlKey));
+
     if (
       !(
         !this._mouseStartIsExtended &&
