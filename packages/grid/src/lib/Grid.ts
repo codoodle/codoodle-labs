@@ -136,10 +136,12 @@ export class Grid extends Container {
   protected _rowsBF: GridRow[];
   protected _rowsBN: GridRow[];
   protected _rowsHeader: GridRowsHeader;
+  protected _rowsFrozen: number;
   protected _columnsHR: GridColumn[];
   protected _columnsBF: GridColumn[];
   protected _columnsBN: GridColumn[];
   protected _columnsHeader: GridColumnsHeader;
+  protected _columnsFrozen: number;
 
   protected _inHCF: GridPart | undefined;
   protected _inHCN: GridPart;
@@ -311,10 +313,12 @@ export class Grid extends Container {
     this._rowsBF = useFF || useNF ? rows.slice(0, rowsFrozen) : [];
     this._rowsBN = Array.from(rows);
     this._rowsHeader = rowsHeader;
+    this._rowsFrozen = rowsFrozen;
     this._columnsHR = rowsHeader.columnsFactory();
     this._columnsBF = useFF || useFN ? columns.slice(0, columnsFrozen) : [];
     this._columnsBN = Array.from(columns);
     this._columnsHeader = columnsHeader;
+    this._columnsFrozen = columnsFrozen;
     if (useFN) {
       this._inHCF = new GridPart(
         GridPart.TYPE_HCF,
@@ -385,6 +389,17 @@ export class Grid extends Container {
         this._cellFactory,
       );
     }
+
+    if (merges) {
+      this.validateMerges(merges, "body");
+    }
+    if (rowsHeader.merges) {
+      this.validateMerges(rowsHeader.merges, "rowsHeader");
+    }
+    if (columnsHeader.merges) {
+      this.validateMerges(columnsHeader.merges, "columnsHeader");
+    }
+
     this._merges = merges;
     this._mergeIndex = new Map();
     this.buildMergeIndex();
@@ -1672,19 +1687,34 @@ export class Grid extends Container {
   ): void {
     if (args.propertyName === "merges") {
       if (args.source === this._rowsHeader) {
+        const merges = args.value as GridMerge[];
+        if (merges) {
+          this.validateMerges(merges, "rowsHeader");
+        }
+
         const { hrf, hrn } = this.separateMergeOptions({
-          rowsHeader: args.value as GridMerge[],
+          rowsHeader: merges,
         });
         if (this._inHRF && hrf) this._inHRF.merge(hrf);
         if (this._inHRN && hrn) this._inHRN.merge(hrn);
       } else if (args.source === this._columnsHeader) {
+        const merges = args.value as GridMerge[];
+        if (merges) {
+          this.validateMerges(merges, "columnsHeader");
+        }
+
         const { hcf, hcn } = this.separateMergeOptions({
-          columnsHeader: args.value as GridMerge[],
+          columnsHeader: merges,
         });
         if (this._inHCF && hcf) this._inHCF.merge(hcf);
         if (this._inHCN && hcn) this._inHCN.merge(hcn);
         return;
       } else if (args.source === this) {
+        const merges = args.value as GridMerge[];
+        if (merges) {
+          this.validateMerges(merges, "body");
+        }
+
         const { bff, bnf, bfn, bnn } = this.separateMergeOptions({
           body: args.value as GridMerge[],
         });
@@ -2142,6 +2172,116 @@ export class Grid extends Container {
     this._elementScroll.addEventListener("scroll", this._scrollListener, false);
     window.removeEventListener("mousemove", this._mouseMoveListener, false);
     window.removeEventListener("mouseup", this._mouseUpListener, false);
+  }
+
+  /**
+   * merges 유효성을 검사합니다.
+   * @param merges 검사할 병합 목록
+   * @param type 병합 타입 ('body', 'rowsHeader', 'columnsHeader')
+   */
+  private validateMerges(
+    merges: ReadonlyArray<GridMerge>,
+    type: "body" | "rowsHeader" | "columnsHeader",
+  ): void {
+    const rowsHeaderSize = this._rowsHeader.columnsFactory().length;
+    const columnsHeaderSize = this._columnsHeader.rowsFactory().length;
+
+    for (let i = 0; i < merges.length; i++) {
+      const merge = merges[i];
+      const { rowIndex, rowSpan, columnIndex, columnSpan } = merge;
+      if (rowIndex < 0 || columnIndex < 0) {
+        throw new Error(
+          `[Grid] Invalid merge at index ${i}: rowIndex and columnIndex must be non-negative. ` +
+            `Got rowIndex=${rowIndex}, columnIndex=${columnIndex}`,
+        );
+      }
+      if (rowSpan <= 0 || columnSpan <= 0) {
+        throw new Error(
+          `[Grid] Invalid merge at index ${i}: rowSpan and columnSpan must be positive. ` +
+            `Got rowSpan=${rowSpan}, columnSpan=${columnSpan}`,
+        );
+      }
+
+      if (type === "body") {
+        const totalRows = this._rowsBN.length;
+        const totalColumns = this._columnsBN.length;
+        const rowEnd = rowIndex + rowSpan - 1;
+        const columnEnd = columnIndex + columnSpan - 1;
+        if (rowEnd >= totalRows) {
+          throw new Error(
+            `[Grid] Invalid merge at index ${i}: merge exceeds total rows. ` +
+              `Total rows: ${totalRows}, merge tries to span to row ${rowEnd}`,
+          );
+        }
+        if (columnEnd >= totalColumns) {
+          throw new Error(
+            `[Grid] Invalid merge at index ${i}: merge exceeds total columns. ` +
+              `Total columns: ${totalColumns}, merge tries to span to column ${columnEnd}`,
+          );
+        }
+
+        const spansCrossFrozenRow =
+          rowIndex < this._rowsFrozen && rowEnd >= this._rowsFrozen;
+        const spansCrossFrozenColumn =
+          columnIndex < this._columnsFrozen && columnEnd >= this._columnsFrozen;
+        if (spansCrossFrozenRow) {
+          throw new Error(
+            `[Grid] Invalid merge at index ${i}: merge cannot span across frozen row boundary. ` +
+              `Frozen rows: ${this._rowsFrozen}, merge spans rows ${rowIndex} to ${rowEnd}`,
+          );
+        }
+        if (spansCrossFrozenColumn) {
+          throw new Error(
+            `[Grid] Invalid merge at index ${i}: merge cannot span across frozen column boundary. ` +
+              `Frozen columns: ${this._columnsFrozen}, merge spans columns ${columnIndex} to ${columnEnd}`,
+          );
+        }
+      } else if (type === "rowsHeader") {
+        const totalRows = this._rowsBN.length;
+        if (rowIndex + rowSpan - 1 >= totalRows) {
+          throw new Error(
+            `[Grid] Invalid merge at index ${i} in rowsHeader: merge exceeds total rows. ` +
+              `Total rows: ${totalRows}, merge tries to span to row ${rowIndex + rowSpan - 1}`,
+          );
+        }
+        if (columnIndex + columnSpan > rowsHeaderSize) {
+          throw new Error(
+            `[Grid] Invalid merge at index ${i} in rowsHeader: merge exceeds header columns. ` +
+              `Header columns: ${rowsHeaderSize}, merge tries to span to column ${columnIndex + columnSpan - 1}`,
+          );
+        }
+      } else if (type === "columnsHeader") {
+        const totalColumns = this._columnsBN.length;
+        if (columnIndex + columnSpan - 1 >= totalColumns) {
+          throw new Error(
+            `[Grid] Invalid merge at index ${i} in columnsHeader: merge exceeds total columns. ` +
+              `Total columns: ${totalColumns}, merge tries to span to column ${columnIndex + columnSpan - 1}`,
+          );
+        }
+        if (rowIndex + rowSpan > columnsHeaderSize) {
+          throw new Error(
+            `[Grid] Invalid merge at index ${i} in columnsHeader: merge exceeds header rows. ` +
+              `Header rows: ${columnsHeaderSize}, merge tries to span to row ${rowIndex + rowSpan - 1}`,
+          );
+        }
+      }
+
+      for (let j = i + 1; j < merges.length; j++) {
+        const other = merges[j];
+        const overlaps =
+          rowIndex < other.rowIndex + other.rowSpan &&
+          rowIndex + rowSpan > other.rowIndex &&
+          columnIndex < other.columnIndex + other.columnSpan &&
+          columnIndex + columnSpan > other.columnIndex;
+        if (overlaps) {
+          throw new Error(
+            `[Grid] Overlapping merges detected at indices ${i} and ${j}. ` +
+              `Merge ${i}: row ${rowIndex}-${rowIndex + rowSpan - 1}, column ${columnIndex}-${columnIndex + columnSpan - 1}. ` +
+              `Merge ${j}: row ${other.rowIndex}-${other.rowIndex + other.rowSpan - 1}, column ${other.columnIndex}-${other.columnIndex + other.columnSpan - 1}`,
+          );
+        }
+      }
+    }
   }
 
   /**
