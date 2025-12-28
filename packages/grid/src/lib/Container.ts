@@ -56,7 +56,7 @@ export abstract class Container extends Control {
       this._element.appendChild(this._elementTrap);
     }
     this._element.appendChild(this._elementWrapper);
-    this._measureOptimized = toOptimizer(this, () => this.measure());
+    this._measureOptimized = toOptimizer(this, () => this.measure(true));
     this._resizeObserver = new ResizeObserver((entries) => {
       if (!entries.length) {
         return;
