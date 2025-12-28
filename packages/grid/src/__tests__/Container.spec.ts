@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import type { Size } from "../lib";
+import type { Size, toOptimizer } from "../lib";
 import { Container } from "../lib/Container";
 
 class TestContainer extends Container {
@@ -19,11 +19,62 @@ describe("Container", () => {
   let element: HTMLElement;
 
   beforeEach(() => {
+    vi.useFakeTimers();
+
     element = document.createElement("div");
-    element.style.width = "200px";
-    element.style.height = "100px";
+    Object.defineProperty(element.style, "width", {
+      configurable: true,
+      get() {
+        return this._width;
+      },
+      set(value: string) {
+        this._width = value;
+        const c: {
+          _element: HTMLElement;
+          _elementWrapper: HTMLElement;
+          _measureOptimized: ReturnType<typeof toOptimizer> | undefined;
+        } = container as any;
+        Object.defineProperty(c._element, "clientWidth", {
+          configurable: true,
+          value: parseInt(value, 10),
+        });
+        c._elementWrapper.style.width = value;
+        Object.defineProperty(c._elementWrapper, "clientWidth", {
+          configurable: true,
+          value: parseInt(value, 10),
+        });
+        c._measureOptimized?.();
+      },
+    });
+    Object.defineProperty(element.style, "height", {
+      configurable: true,
+      get() {
+        return this._height;
+      },
+      set(value: string) {
+        this._height = value;
+        const c: {
+          _element: HTMLElement;
+          _elementWrapper: HTMLElement;
+          _measureOptimized: ReturnType<typeof toOptimizer> | undefined;
+        } = container as any;
+        Object.defineProperty(c._element, "clientHeight", {
+          configurable: true,
+          value: parseInt(value, 10),
+        });
+        c._elementWrapper.style.height = value;
+        Object.defineProperty(c._elementWrapper, "clientHeight", {
+          configurable: true,
+          value: parseInt(value, 10),
+        });
+        c._measureOptimized?.();
+      },
+    });
+
     document.body.appendChild(element);
     container = new TestContainer(element);
+    element.style.width = "200px";
+    element.style.height = "100px";
   });
 
   afterEach(() => {
@@ -101,41 +152,53 @@ describe("Container", () => {
   describe("layout and measurement", () => {
     test("should call arrange during initialization", () => {
       container.initialize();
-      // invalidateLayout forces a measure with force=true
-      container.invalidateLayout();
+      vi.advanceTimersToNextFrame();
 
       expect(container.getArrangeSize()).toBeDefined();
+      expect(container.getArrangeSize()?.width).toBe(200);
+      expect(container.getArrangeSize()?.height).toBe(100);
     });
 
-    test("should track width and height", () => {
+    test("should track width and height changes", () => {
       container.initialize();
-      container.invalidateLayout();
+      vi.advanceTimersToNextFrame();
 
-      expect(container.getArrangeSize()).toBeDefined();
-      expect(container.getArrangeSize()?.width).toBeGreaterThanOrEqual(0);
-      expect(container.getArrangeSize()?.height).toBeGreaterThanOrEqual(0);
-    });
+      expect(container.getArrangeSize()?.width).toBe(200);
+      expect(container.getArrangeSize()?.height).toBe(100);
 
-    test("should call arrange with correct size", () => {
       element.style.width = "300px";
       element.style.height = "150px";
-      container.initialize();
-      container.invalidateLayout();
+      vi.advanceTimersToNextFrame();
 
-      const arrangeSize = container.getArrangeSize();
-      expect(arrangeSize).toBeDefined();
-      expect(typeof arrangeSize?.width).toBe("number");
-      expect(typeof arrangeSize?.height).toBe("number");
+      expect(container.getArrangeSize()?.width).toBe(300);
+      expect(container.getArrangeSize()?.height).toBe(150);
     });
 
-    test("should invalidate layout", () => {
+    test("should update arrange size on element resize", () => {
       container.initialize();
+
+      element.style.width = "400px";
+      element.style.height = "250px";
+      vi.advanceTimersToNextFrame();
+
+      const arrangeSize = container.getArrangeSize();
+      expect(arrangeSize?.width).toBe(400);
+      expect(arrangeSize?.height).toBe(250);
+    });
+
+    test("should invalidate layout when explicitly called", () => {
+      container.initialize();
+      vi.advanceTimersToNextFrame();
+
+      const initialSize = container.getArrangeSize();
+      expect(initialSize).toBeDefined();
+
       container.invalidateLayout();
 
-      container.getArrangeSize();
-      container.invalidateLayout();
-
-      expect(container.getArrangeSize()).toBeDefined();
+      const newSize = container.getArrangeSize();
+      expect(newSize).toBeDefined();
+      expect(newSize?.width).toBe(200);
+      expect(newSize?.height).toBe(100);
     });
   });
 
@@ -229,36 +292,63 @@ describe("Container", () => {
   });
 
   describe("resize handling", () => {
-    test("should handle element size changes", () => {
+    test("should automatically handle element size changes", () => {
       container.initialize();
+      vi.advanceTimersToNextFrame();
+
       element.style.width = "400px";
       element.style.height = "200px";
+      vi.advanceTimersToNextFrame();
 
-      container.invalidateLayout();
-
-      expect(container.isInitialized).toBe(true);
+      const arrangeSize = container.getArrangeSize();
+      expect(arrangeSize?.width).toBe(400);
+      expect(arrangeSize?.height).toBe(200);
     });
 
     test("should respond to very small element size", () => {
+      container.initialize();
+      vi.advanceTimersToNextFrame();
+
       element.style.width = "50px";
       element.style.height = "25px";
-      container.initialize();
-      container.invalidateLayout();
+      vi.advanceTimersToNextFrame();
 
       const arrangeSize = container.getArrangeSize();
-      expect(arrangeSize).toBeDefined();
+      expect(arrangeSize?.width).toBe(50);
+      expect(arrangeSize?.height).toBe(25);
     });
 
     test("should handle large element size", () => {
+      container.initialize();
+      vi.advanceTimersToNextFrame();
+
       element.style.width = "1000px";
       element.style.height = "800px";
-      container.initialize();
-      container.invalidateLayout();
+      vi.advanceTimersToNextFrame();
 
       const arrangeSize = container.getArrangeSize();
-      expect(arrangeSize).toBeDefined();
-      expect(typeof arrangeSize?.width).toBe("number");
-      expect(typeof arrangeSize?.height).toBe("number");
+      expect(arrangeSize?.width).toBe(1000);
+      expect(arrangeSize?.height).toBe(800);
+    });
+
+    test("should handle multiple consecutive size changes", () => {
+      container.initialize();
+      vi.advanceTimersToNextFrame();
+
+      element.style.width = "100px";
+      element.style.height = "100px";
+      vi.advanceTimersToNextFrame();
+      expect(container.getArrangeSize()?.width).toBe(100);
+
+      element.style.width = "200px";
+      element.style.height = "200px";
+      vi.advanceTimersToNextFrame();
+      expect(container.getArrangeSize()?.width).toBe(200);
+
+      element.style.width = "300px";
+      element.style.height = "300px";
+      vi.advanceTimersToNextFrame();
+      expect(container.getArrangeSize()?.width).toBe(300);
     });
   });
 
@@ -283,8 +373,15 @@ describe("Container", () => {
 
     test("should handle multiple consecutive operations", () => {
       container.initialize();
-      container.invalidateLayout();
-      container.invalidateLayout();
+      vi.advanceTimersToNextFrame();
+
+      element.style.width = "300px";
+      vi.advanceTimersToNextFrame();
+      expect(container.getArrangeSize()?.width).toBe(300);
+
+      element.style.width = "400px";
+      vi.advanceTimersToNextFrame();
+      expect(container.getArrangeSize()?.width).toBe(400);
 
       expect(container.isInitialized).toBe(true);
       expect(container.isDisposed).toBe(false);
