@@ -1048,7 +1048,6 @@ export class GridPart extends Container {
       }
       if (cell.isMerged) {
         cell.element.remove();
-        cell.dispose();
         return false;
       }
     }
