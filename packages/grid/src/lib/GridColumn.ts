@@ -2,7 +2,7 @@ import { type EventArgs, type PropertyChangeEventArgs } from "./EventArgs";
 import { SupportPropertyChange } from "./SupportPropertyChange";
 import { Visibility } from "./Visibility";
 
-interface GridColumnEventMap<TSource extends GridColumn = GridColumn> {
+export interface GridColumnEventMap<TSource extends GridColumn = GridColumn> {
   /**
    * 열의 너비 속성 변경 이벤트입니다.
    */

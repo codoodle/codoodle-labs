@@ -3,7 +3,7 @@ import type { GridMerge } from "./GridMerge";
 import { GridRow } from "./GridRow";
 import { SupportPropertyChange } from "./SupportPropertyChange";
 
-interface GridColumnsHeaderEventMap<
+export interface GridColumnsHeaderEventMap<
   TSource extends GridColumnsHeader = GridColumnsHeader,
 > {
   /**

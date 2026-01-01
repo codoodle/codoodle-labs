@@ -2,7 +2,7 @@ import { type EventArgs, type PropertyChangeEventArgs } from "./EventArgs";
 import { SupportPropertyChange } from "./SupportPropertyChange";
 import { Visibility } from "./Visibility";
 
-interface GridRowEventMap<TSource extends GridRow = GridRow> {
+export interface GridRowEventMap<TSource extends GridRow = GridRow> {
   /**
    * 행의 높이 속성 변경 이벤트입니다.
    */
