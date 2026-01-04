@@ -4,9 +4,9 @@ import type { GridBounds } from "./GridBounds";
 import { GridCell } from "./GridCell";
 import type { GridCellFactory } from "./GridCellFactory";
 import { DefaultGridCellFactory } from "./GridCellFactory";
-import type { GridColumn } from "./GridColumn";
+import type { GridColumnArray } from "./GridColumnArray.ts";
 import type { GridMerge } from "./GridMerge";
-import type { GridRow } from "./GridRow";
+import type { GridRowArray } from "./GridRowArray.ts";
 import type { Point } from "./Point";
 import type { Rect } from "./Rect";
 import type { Size } from "./Size";
@@ -37,8 +37,8 @@ export class GridPart extends Container {
 
   protected _zIndex: number;
   protected _type: symbol;
-  protected _rows: ReadonlyArray<GridRow>;
-  protected _columns: ReadonlyArray<GridColumn>;
+  protected _rows: GridRowArray;
+  protected _columns: GridColumnArray;
   protected _location: Point;
   protected _scroll: Point;
   protected _cells: Map<CellKey, GridCell>;
@@ -77,7 +77,7 @@ export class GridPart extends Container {
   /**
    * 표시할 행 목록을 가져옵니다.
    */
-  get rows(): ReadonlyArray<GridRow> {
+  get rows(): GridRowArray {
     return this._rows;
   }
 
@@ -86,7 +86,7 @@ export class GridPart extends Container {
    */
   get rowsHeight(): number {
     if (this._rows) {
-      return this._rows[this._rows.length - 1].bottom;
+      return this._rows.bottom(this._rows.length - 1);
     }
     return 0;
   }
@@ -94,7 +94,7 @@ export class GridPart extends Container {
   /**
    * 표시할 열 목록을 가져옵니다.
    */
-  get columns(): ReadonlyArray<GridColumn> {
+  get columns(): GridColumnArray {
     return this._columns;
   }
 
@@ -103,7 +103,7 @@ export class GridPart extends Container {
    */
   get columnsWidth(): number {
     if (this._columns) {
-      return this._columns[this._columns.length - 1].right;
+      return this._columns.right(this._columns.length - 1);
     }
     return 0;
   }
@@ -158,8 +158,8 @@ export class GridPart extends Container {
    */
   constructor(
     type: symbol,
-    rows: GridRow[],
-    columns: GridColumn[],
+    rows: GridRowArray,
+    columns: GridColumnArray,
     cellFactory?: GridCellFactory,
   ) {
     super(document.createElement("div"));
@@ -281,8 +281,8 @@ export class GridPart extends Container {
     };
     const { rowBegin, rowEnd, columnBegin, columnEnd } =
       this.getIndexBounds(bounds);
-    const left = bounds.left - this._columns[columnBegin].left;
-    const top = bounds.top - this._rows[rowBegin].top;
+    const left = bounds.left - this._columns.left(columnBegin);
+    const top = bounds.top - this._rows.top(rowBegin);
     this._elementWrapper.style.left = left * -1 + "px";
     this._elementWrapper.style.top = top * -1 + "px";
     if (
@@ -322,18 +322,18 @@ export class GridPart extends Container {
 
     let { x, y } = this._scroll;
     if (this._cellsIndex.columnBegin >= columnBegin) {
-      x = this._columns[columnBegin].left - this._location.x;
+      x = this._columns.left(columnBegin) - this._location.x;
     } else if (this._cellsIndex.columnEnd <= columnBegin) {
-      x = Math.max(0, this._columns[columnEnd].right - this.width);
-    } else if (x + this._location.x > this._columns[columnBegin].left) {
-      x -= x + this._location.x - this._columns[columnBegin].left;
+      x = Math.max(0, this._columns.right(columnEnd) - this.width);
+    } else if (x + this._location.x > this._columns.left(columnBegin)) {
+      x -= x + this._location.x - this._columns.left(columnBegin);
     }
     if (this._cellsIndex.rowBegin >= rowBegin) {
-      y = this._rows[rowBegin].top - this._location.y;
+      y = this._rows.top(rowBegin) - this._location.y;
     } else if (this._cellsIndex.rowEnd <= rowEnd) {
-      y = Math.max(0, this._rows[rowEnd].bottom - this.height);
-    } else if (y + this._location.y > this._rows[rowBegin].top) {
-      y -= y + this._location.y - this._rows[rowBegin].top;
+      y = Math.max(0, this._rows.bottom(rowEnd) - this.height);
+    } else if (y + this._location.y > this._rows.top(rowBegin)) {
+      y -= y + this._location.y - this._rows.top(rowBegin);
     }
     this.scrollTo({ x, y });
   }
@@ -625,12 +625,12 @@ export class GridPart extends Container {
     const left =
       location.x -
       boundsWrapper.left +
-      this._columns[this._cellsIndex.columnBegin].left -
+      this._columns.left(this._cellsIndex.columnBegin) -
       this._location.x;
     const top =
       location.y -
       boundsWrapper.top +
-      this._rows[this._cellsIndex.rowBegin].top -
+      this._rows.top(this._cellsIndex.rowBegin) -
       this._location.y;
     const index = this.getIndexBounds({ left, top, width: 0, height: 0 });
     return this.isCellSelected(index.rowBegin, index.columnBegin);
@@ -688,12 +688,12 @@ export class GridPart extends Container {
     const left =
       location.x -
       boundsWrapper.left +
-      this._columns[this._cellsIndex.columnBegin].left -
+      this._columns.left(this._cellsIndex.columnBegin) -
       this._location.x;
     const top =
       location.y -
       boundsWrapper.top +
-      this._rows[this._cellsIndex.rowBegin].top -
+      this._rows.top(this._cellsIndex.rowBegin) -
       this._location.y;
     const index = this.getIndexBounds({ left, top, width: 0, height: 0 });
     if (raw) {
@@ -722,8 +722,8 @@ export class GridPart extends Container {
     columnBegin,
     columnEnd,
   }: GridBounds): void {
-    const boundsTop = this._rows[rowBegin].top - this._location.y;
-    const boundsLeft = this._columns[columnBegin].left - this._location.x;
+    const boundsTop = this._rows.top(rowBegin) - this._location.y;
+    const boundsLeft = this._columns.left(columnBegin) - this._location.x;
     if (
       rowBegin > this._cellsIndex.rowEnd ||
       rowEnd < this._cellsIndex.rowBegin ||
@@ -735,13 +735,13 @@ export class GridPart extends Container {
         rowIndex <= this._cellsIndex.rowEnd;
         rowIndex++
       ) {
-        const row = this._rows[rowIndex];
+        const row = this._rows.at(rowIndex);
         for (
           let columnIndex = this._cellsIndex.columnBegin;
           columnIndex <= this._cellsIndex.columnEnd;
           columnIndex++
         ) {
-          const column = this._columns[columnIndex];
+          const column = this._columns.at(columnIndex);
           const key = cellKey(rowIndex, columnIndex);
           const cell = this._cells.get(key);
           if (cell && cell.isDisplayed) {
@@ -782,7 +782,7 @@ export class GridPart extends Container {
       );
       const maxColumnIndex = Math.max(columnEnd, this._cellsIndex.columnEnd);
       for (let rowIndex = minRowIndex; rowIndex <= maxRowIndex; rowIndex++) {
-        const row = this._rows[rowIndex];
+        const row = this._rows.at(rowIndex);
         for (
           let columnIndex = minColumnIndex;
           columnIndex <= maxColumnIndex;
@@ -796,7 +796,7 @@ export class GridPart extends Container {
           ) {
             continue;
           }
-          const column = this._columns[columnIndex];
+          const column = this._columns.at(columnIndex);
           const key = cellKey(rowIndex, columnIndex);
           const cell = this._cells.get(key);
           if (cell && cell.isDisplayed) {
@@ -831,13 +831,13 @@ export class GridPart extends Container {
     }
 
     for (let rowIndex = rowBegin; rowIndex <= rowEnd; rowIndex++) {
-      const row = this._rows[rowIndex];
+      const row = this._rows.at(rowIndex);
       for (
         let columnIndex = columnBegin;
         columnIndex <= columnEnd;
         columnIndex++
       ) {
-        const column = this._columns[columnIndex];
+        const column = this._columns.at(columnIndex);
         const key = cellKey(rowIndex, columnIndex);
         if (this._cells.has(key)) {
           const cell = this._cells.get(key);
@@ -894,14 +894,14 @@ export class GridPart extends Container {
     const lastColumnIndex = this._columns.length - 1;
 
     let rowBegin = 0;
-    if (top >= this._rows[lastRowIndex].bottom) {
+    if (top >= this._rows.bottom(lastRowIndex)) {
       rowBegin = lastRowIndex;
     } else {
       let lo = 0;
       let hi = lastRowIndex;
       while (lo <= hi) {
         const mid = Math.floor((lo + hi) / 2);
-        const row = this._rows[mid];
+        const row = this._rows.at(mid);
         if (top < row.bottom) {
           rowBegin = mid;
           hi = mid - 1;
@@ -912,14 +912,14 @@ export class GridPart extends Container {
     }
 
     let rowEnd = 0;
-    if (top >= this._rows[lastRowIndex].bottom) {
+    if (top >= this._rows.bottom(lastRowIndex)) {
       rowEnd = lastRowIndex;
     } else {
       let lo = 0;
       let hi = lastRowIndex;
       while (lo <= hi) {
         const mid = Math.floor((lo + hi) / 2);
-        const row = this._rows[mid];
+        const row = this._rows.at(mid);
         if (row.top < bottom || (isPoint && row.top <= bottom)) {
           rowEnd = mid;
           lo = mid + 1;
@@ -930,14 +930,14 @@ export class GridPart extends Container {
     }
 
     let columnBegin = 0;
-    if (left >= this._columns[lastColumnIndex].right) {
+    if (left >= this._columns.right(lastColumnIndex)) {
       columnBegin = lastColumnIndex;
     } else {
       let lo = 0;
       let hi = lastColumnIndex;
       while (lo <= hi) {
         const mid = Math.floor((lo + hi) / 2);
-        const column = this._columns[mid];
+        const column = this._columns.at(mid);
         if (left < column.right) {
           columnBegin = mid;
           hi = mid - 1;
@@ -948,14 +948,14 @@ export class GridPart extends Container {
     }
 
     let columnEnd = 0;
-    if (left >= this._columns[lastColumnIndex].right) {
+    if (left >= this._columns.right(lastColumnIndex)) {
       columnEnd = lastColumnIndex;
     } else {
       let lo = 0;
       let hi = lastColumnIndex;
       while (lo <= hi) {
         const mid = Math.floor((lo + hi) / 2);
-        const column = this._columns[mid];
+        const column = this._columns.at(mid);
         if (column.left < right || (isPoint && column.left <= right)) {
           columnEnd = mid;
           lo = mid + 1;
@@ -983,7 +983,7 @@ export class GridPart extends Container {
   ): GridCell | undefined {
     let rowCollapsed = true;
     for (let i = rowIndex; i < rowIndex + rowSpan; i++) {
-      const row = this._rows[i];
+      const row = this._rows.at(i);
       if (row.visibility !== Visibility.Collapsed) {
         rowCollapsed = false;
         break;
@@ -994,7 +994,7 @@ export class GridPart extends Container {
     }
     let columnCollapsed = true;
     for (let i = columnIndex; i < columnIndex + columnSpan; i++) {
-      const column = this._columns[i];
+      const column = this._columns.at(i);
       if (column.visibility !== Visibility.Collapsed) {
         columnCollapsed = false;
         break;

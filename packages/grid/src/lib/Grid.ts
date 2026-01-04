@@ -9,11 +9,13 @@ import type { GridBounds } from "./GridBounds";
 import type { GridCellFactory } from "./GridCellFactory";
 import { DefaultGridCellFactory } from "./GridCellFactory";
 import { GridColumn } from "./GridColumn";
+import { GridColumnArray } from "./GridColumnArray.ts";
 import { GridColumnsHeader } from "./GridColumnsHeader";
 import type { GridMerge } from "./GridMerge";
 import type { GridOptions } from "./GridOptions";
 import { GridPart } from "./GridPart";
 import { GridRow } from "./GridRow";
+import { GridRowArray } from "./GridRowArray.ts";
 import { GridRowsHeader } from "./GridRowsHeader";
 import { GridSelectionMode } from "./GridSelectionMode";
 import { GridSelectionUnit } from "./GridSelectionUnit";
@@ -132,14 +134,14 @@ export class Grid extends Container {
   protected _mouseMoveTickListener: () => void;
   protected _mouseUpListener: () => void;
 
-  protected _rowsHC: GridRow[];
-  protected _rowsBF: GridRow[];
-  protected _rowsBN: GridRow[];
+  protected _rowsHC: GridRowArray;
+  protected _rowsBF: GridRowArray;
+  protected _rowsBN: GridRowArray;
   protected _rowsHeader: GridRowsHeader;
   protected _rowsFrozen: number;
-  protected _columnsHR: GridColumn[];
-  protected _columnsBF: GridColumn[];
-  protected _columnsBN: GridColumn[];
+  protected _columnsHR: GridColumnArray;
+  protected _columnsBF: GridColumnArray;
+  protected _columnsBN: GridColumnArray;
   protected _columnsHeader: GridColumnsHeader;
   protected _columnsFrozen: number;
 
@@ -170,7 +172,7 @@ export class Grid extends Container {
   /**
    * 표시할 행 목록을 가져옵니다.
    */
-  get rows(): GridRow[] {
+  get rows(): GridRowArray {
     return this._rowsBN;
   }
 
@@ -184,7 +186,7 @@ export class Grid extends Container {
   /**
    * 표시할 열 목록을 가져옵니다.
    */
-  get columns(): GridColumn[] {
+  get columns(): GridColumnArray {
     return this._columnsBN;
   }
 
@@ -255,10 +257,16 @@ export class Grid extends Container {
   constructor(
     element: HTMLDivElement,
     {
-      rows,
+      rows: optionRows,
+      rowCount: optionRowCount,
+      rowFactory: optionRowFactory,
+      rowCacheSize: optionRowCacheSize = 1000,
       rowsFrozen = 0,
       rowsHeader = new GridRowsHeader(),
-      columns,
+      columns: optionsColumns,
+      columnCount: optionsColumnCount,
+      columnFactory: optionsColumnFactory,
+      columnCacheSize: optionsColumnCacheSize = 500,
       columnsFrozen = 0,
       columnsHeader = new GridColumnsHeader(),
       merges,
@@ -309,14 +317,36 @@ export class Grid extends Container {
     const useFF = rowsFrozen > 0 && columnsFrozen > 0;
     const useNF = rowsFrozen > 0;
     const useFN = columnsFrozen > 0;
-    this._rowsHC = columnsHeader.rowsFactory();
-    this._rowsBF = useFF || useNF ? rows.slice(0, rowsFrozen) : [];
-    this._rowsBN = Array.from(rows);
+    this._rowsHC = new GridRowArray(columnsHeader.rowsFactory());
+    this._rowsBF =
+      useFF || useNF
+        ? optionRows
+          ? new GridRowArray(optionRows.slice(0, rowsFrozen))
+          : new GridRowArray(rowsFrozen, optionRowFactory, optionRowCacheSize)
+        : new GridRowArray([]);
+    this._rowsBN = optionRows
+      ? new GridRowArray(optionRows)
+      : new GridRowArray(optionRowCount, optionRowFactory, optionRowCacheSize);
     this._rowsHeader = rowsHeader;
     this._rowsFrozen = rowsFrozen;
-    this._columnsHR = rowsHeader.columnsFactory();
-    this._columnsBF = useFF || useFN ? columns.slice(0, columnsFrozen) : [];
-    this._columnsBN = Array.from(columns);
+    this._columnsHR = new GridColumnArray(rowsHeader.columnsFactory());
+    this._columnsBF =
+      useFF || useFN
+        ? optionsColumns
+          ? new GridColumnArray(optionsColumns.slice(0, columnsFrozen))
+          : new GridColumnArray(
+              columnsFrozen,
+              optionsColumnFactory,
+              optionsColumnCacheSize,
+            )
+        : new GridColumnArray([]);
+    this._columnsBN = optionsColumns
+      ? new GridColumnArray(optionsColumns)
+      : new GridColumnArray(
+          optionsColumnCount,
+          optionsColumnFactory,
+          optionsColumnCacheSize,
+        );
     this._columnsHeader = columnsHeader;
     this._columnsFrozen = columnsFrozen;
     if (useFN) {
@@ -421,50 +451,14 @@ export class Grid extends Container {
       this._elementScroll.scrollLeft = 0;
       this._elementScroll.scrollTop = 0;
     } else {
-      {
-        let height = 0;
-        let index = 0;
-        for (const row of this._rowsBN) {
-          row.on("heightChanged", this._propertyChangedHandler);
-          row.on("visibilityChanged", this._propertyChangedHandler);
-          (row as unknown as { _index: number })._index = index++;
-          (row as unknown as { _top: number })._top = height;
-          height += row.height;
-        }
-      }
-      {
-        let height = 0;
-        let index = 0;
-        for (const row of this._rowsHC) {
-          row.on("heightChanged", this._propertyChangedHandler);
-          row.on("visibilityChanged", this._propertyChangedHandler);
-          (row as unknown as { _index: number })._index = index++;
-          (row as unknown as { _top: number })._top = height;
-          height += row.height;
-        }
-      }
-      {
-        let width = 0;
-        let index = 0;
-        for (const column of this._columnsBN) {
-          column.on("widthChanged", this._propertyChangedHandler);
-          column.on("visibilityChanged", this._propertyChangedHandler);
-          (column as unknown as { _index: number })._index = index++;
-          (column as unknown as { _left: number })._left = width;
-          width += column.width;
-        }
-      }
-      {
-        let width = 0;
-        let index = 0;
-        for (const column of this._columnsHR) {
-          column.on("widthChanged", this._propertyChangedHandler);
-          column.on("visibilityChanged", this._propertyChangedHandler);
-          (column as unknown as { _index: number })._index = index++;
-          (column as unknown as { _left: number })._left = width;
-          width += column.width;
-        }
-      }
+      this._rowsBN.on("heightChanged", this._propertyChangedHandler);
+      this._rowsBN.on("visibilityChanged", this._propertyChangedHandler);
+      this._rowsHC.on("heightChanged", this._propertyChangedHandler);
+      this._rowsHC.on("visibilityChanged", this._propertyChangedHandler);
+      this._columnsBN.on("widthChanged", this._propertyChangedHandler);
+      this._columnsBN.on("visibilityChanged", this._propertyChangedHandler);
+      this._columnsHR.on("widthChanged", this._propertyChangedHandler);
+      this._columnsHR.on("visibilityChanged", this._propertyChangedHandler);
       this._element.classList.add(styles.grid);
       this._elementWrapper.appendChild(this._elementBD);
       this._elementWrapper.appendChild(this._elementHC);
@@ -764,12 +758,12 @@ export class Grid extends Container {
       );
       this._inBNN.dispose();
     }
-    if (this._rowsHC) this._rowsHC.length = 0;
-    if (this._rowsBF) this._rowsBF.length = 0;
-    if (this._rowsBN) this._rowsBN.length = 0;
-    if (this._columnsHR) this._columnsHR.length = 0;
-    if (this._columnsBF) this._columnsBF.length = 0;
-    if (this._columnsBN) this._columnsBN.length = 0;
+    this._rowsHC?.dispose();
+    this._rowsBF?.dispose();
+    this._rowsBN?.dispose();
+    this._columnsHR?.dispose();
+    this._columnsBF?.dispose();
+    this._columnsBN?.dispose();
     super.dispose();
   }
 
@@ -903,10 +897,10 @@ export class Grid extends Container {
   protected arrange(availableSize: Size): void {
     const headerWidth = this._rowsHeader.isCollapsed
       ? 0
-      : this._columnsHR[this._columnsHR.length - 1].right;
+      : this._columnsHR.at(this._columnsHR.length - 1).right;
     const headerHeight = this._columnsHeader.isCollapsed
       ? 0
-      : this._rowsHC[this._rowsHC.length - 1].bottom;
+      : this._rowsHC.at(this._rowsHC.length - 1).bottom;
     availableSize.width -= headerWidth;
     availableSize.height -= headerHeight;
 
@@ -1153,9 +1147,9 @@ export class Grid extends Container {
           while (
             columnIndexPrevious >= 0 &&
             columnIndexPrevious < this._columnsBN.length &&
-            (this._columnsBN[columnIndexPrevious].visibility ===
+            (this._columnsBN.at(columnIndexPrevious).visibility ===
               Visibility.Hidden ||
-              this._columnsBN[columnIndexPrevious].visibility ===
+              this._columnsBN.at(columnIndexPrevious).visibility ===
                 Visibility.Collapsed)
           ) {
             columnIndexPrevious++;
@@ -1165,9 +1159,9 @@ export class Grid extends Container {
           while (
             columnIndexPrevious >= 0 &&
             columnIndexPrevious < this._columnsBN.length &&
-            (this._columnsBN[columnIndexPrevious].visibility ===
+            (this._columnsBN.at(columnIndexPrevious).visibility ===
               Visibility.Hidden ||
-              this._columnsBN[columnIndexPrevious].visibility ===
+              this._columnsBN.at(columnIndexPrevious).visibility ===
                 Visibility.Collapsed)
           ) {
             columnIndexPrevious--;
@@ -1182,8 +1176,9 @@ export class Grid extends Container {
           while (
             rowIndexPrevious >= 0 &&
             rowIndexPrevious < this._rowsBN.length &&
-            (this._rowsBN[rowIndexPrevious].visibility === Visibility.Hidden ||
-              this._rowsBN[rowIndexPrevious].visibility ===
+            (this._rowsBN.at(rowIndexPrevious).visibility ===
+              Visibility.Hidden ||
+              this._rowsBN.at(rowIndexPrevious).visibility ===
                 Visibility.Collapsed)
           ) {
             rowIndexPrevious++;
@@ -1193,8 +1188,9 @@ export class Grid extends Container {
           while (
             rowIndexPrevious >= 0 &&
             rowIndexPrevious < this._rowsBN.length &&
-            (this._rowsBN[rowIndexPrevious].visibility === Visibility.Hidden ||
-              this._rowsBN[rowIndexPrevious].visibility ===
+            (this._rowsBN.at(rowIndexPrevious).visibility ===
+              Visibility.Hidden ||
+              this._rowsBN.at(rowIndexPrevious).visibility ===
                 Visibility.Collapsed)
           ) {
             rowIndexPrevious--;
@@ -1234,7 +1230,7 @@ export class Grid extends Container {
             let pageHeight = 0;
             let i = this._inBNN.cellsIndex.rowEnd;
             while (i >= this._inBNN.cellsIndex.rowBegin) {
-              const height = this._rowsBN[i--].height;
+              const height = this._rowsBN.at(i--).height;
               if (pageHeight + height > wrapHeight) {
                 break;
               }
@@ -1242,7 +1238,7 @@ export class Grid extends Container {
             }
             i = this._inBNN.cellsIndex.rowBegin;
             while (i >= 0) {
-              const height = this._rowsBN[i--].height;
+              const height = this._rowsBN.at(i--).height;
               pageHeight -= height;
               if (pageHeight <= 0) {
                 break;
@@ -1265,14 +1261,14 @@ export class Grid extends Container {
             let pageHeight = 0;
             let i = this._inBNN.cellsIndex.rowBegin;
             while (i <= this._inBNN.cellsIndex.rowEnd) {
-              const height = this._rowsBN[i++].height;
+              const height = this._rowsBN.at(i++).height;
               if (pageHeight + height > wrapHeight) {
                 break;
               }
               pageHeight += height;
             }
             while (i < this._rowsBN.length) {
-              const height = this._rowsBN[i++].height;
+              const height = this._rowsBN.at(i++).height;
               pageHeight -= height;
               if (pageHeight <= 0) {
                 break;
@@ -1316,8 +1312,8 @@ export class Grid extends Container {
         while (
           rowIndex >= 0 &&
           rowIndex < this._rowsBN.length &&
-          (this._rowsBN[rowIndex].visibility === Visibility.Hidden ||
-            this._rowsBN[rowIndex].visibility === Visibility.Collapsed)
+          (this._rowsBN.at(rowIndex).visibility === Visibility.Hidden ||
+            this._rowsBN.at(rowIndex).visibility === Visibility.Collapsed)
         ) {
           rowIndex--;
         }
@@ -1329,8 +1325,8 @@ export class Grid extends Container {
         while (
           rowIndex >= 0 &&
           rowIndex < this._rowsBN.length &&
-          (this._rowsBN[rowIndex].visibility === Visibility.Hidden ||
-            this._rowsBN[rowIndex].visibility === Visibility.Collapsed)
+          (this._rowsBN.at(rowIndex).visibility === Visibility.Hidden ||
+            this._rowsBN.at(rowIndex).visibility === Visibility.Collapsed)
         ) {
           rowIndex++;
         }
@@ -1341,8 +1337,8 @@ export class Grid extends Container {
         while (
           columnIndex >= 0 &&
           columnIndex < this._columnsBN.length &&
-          (this._columnsBN[columnIndex].visibility === Visibility.Hidden ||
-            this._columnsBN[columnIndex].visibility === Visibility.Collapsed)
+          (this._columnsBN.at(columnIndex).visibility === Visibility.Hidden ||
+            this._columnsBN.at(columnIndex).visibility === Visibility.Collapsed)
         ) {
           columnIndex--;
         }
@@ -1353,8 +1349,8 @@ export class Grid extends Container {
         while (
           columnIndex >= 0 &&
           columnIndex < this._columnsBN.length &&
-          (this._columnsBN[columnIndex].visibility === Visibility.Hidden ||
-            this._columnsBN[columnIndex].visibility === Visibility.Collapsed)
+          (this._columnsBN.at(columnIndex).visibility === Visibility.Hidden ||
+            this._columnsBN.at(columnIndex).visibility === Visibility.Collapsed)
         ) {
           columnIndex++;
         }
@@ -1740,27 +1736,13 @@ export class Grid extends Container {
     const columnChanged = args.source instanceof GridColumn;
     const rowsHeaderChanged = args.source instanceof GridRowsHeader;
     const columnsHeaderChanged = args.source instanceof GridColumnsHeader;
-    if (rowChanged) {
-      let height = 0;
-      for (const row of this._rowsBN) {
-        (row as unknown as { _top: number })._top = height;
-        height += row.height;
-      }
-    }
-    if (columnChanged) {
-      let width = 0;
-      for (const column of this._columnsBN) {
-        (column as unknown as { _left: number })._left = width;
-        width += column.width;
-      }
-    }
     if (
       rowChanged ||
       columnChanged ||
       rowsHeaderChanged ||
       columnsHeaderChanged
     ) {
-      this.initialize();
+      this.measure(true);
     }
   }
 

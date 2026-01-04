@@ -29,7 +29,7 @@ export class GridCell implements Disposable {
    * 셀의 내용을 표시하는 행 입니다.
    */
   get row(): GridRow {
-    return this._inPart?.rows[this._rowBegin];
+    return this._inPart?.rows.at(this._rowBegin);
   }
 
   /**
@@ -57,7 +57,7 @@ export class GridCell implements Disposable {
    * 셀의 내용을 표시하는 열 입니다.
    */
   get column(): GridColumn {
-    return this._inPart?.columns[this._columnBegin];
+    return this._inPart?.columns.at(this._columnBegin);
   }
 
   /**
@@ -176,18 +176,18 @@ export class GridCell implements Disposable {
   ): void {
     if (this.columnSpan > 1) {
       left +=
-        this._inPart.columns[this._columnBegin].left -
-        this._inPart.columns[columnIndex].left;
+        this._inPart.columns.left(this._columnBegin) -
+        this._inPart.columns.left(columnIndex);
       width =
-        this._inPart.columns[this._columnEnd].right -
-        this._inPart.columns[this._columnBegin].left;
+        this._inPart.columns.right(this._columnEnd) -
+        this._inPart.columns.left(this._columnBegin);
     }
     if (this.rowSpan > 1) {
       top +=
-        this._inPart.rows[this._rowBegin].top - this._inPart.rows[rowIndex].top;
+        this._inPart.rows.top(this._rowBegin) - this._inPart.rows.top(rowIndex);
       height =
-        this._inPart.rows[this._rowEnd].bottom -
-        this._inPart.rows[this._rowBegin].top;
+        this._inPart.rows.bottom(this._rowEnd) -
+        this._inPart.rows.top(this._rowBegin);
     }
     this._element.style.left = left + "px";
     this._element.style.top = top + "px";
